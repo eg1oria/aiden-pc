@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useRef, Suspense } from 'react';
+import React, { useRef, Suspense, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, Center, Float } from '@react-three/drei';
-import { useScroll, useTransform, useSpring } from 'framer-motion';
+import { useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 import * as THREE from 'three';
 
 const CONFIG = {
@@ -20,32 +20,32 @@ const CONFIG = {
 
   scroll: {
     yTimes: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0],
-    yKeyframes: [4, 3, 3, 3, 4, 4, 2, 2, 3, 4],
+    yKeyframes: [3, 3, 3, 3, 3, 3, 2, 2, 2, 3],
 
     xTimes: [0, 0.1, 0.2, 0.3, 0.45, 0.55, 0.6, 0.7, 0.85, 1.0],
-    xKeyframes: [2, -1, -2, -5, -5, -3, 1, 2, 2, 2],
+    xKeyframes: [1.5, 1, 0, -1, -1, -1, 0, 1.5, 1.5, 1.5],
 
     rotTimes: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.0],
     rotKeyframes: [
       0,
       Math.PI / 4,
       Math.PI / 2,
-      Math.PI,
-      Math.PI,
-      Math.PI,
-      Math.PI,
       Math.PI * 1.5,
       Math.PI * 2,
       Math.PI * 2,
+      Math.PI * 2,
+      Math.PI * 3,
+      Math.PI * 3.5,
+      Math.PI * 4,
     ],
   },
 
   wobble: 0,
   spring: { stiffness: 80, damping: 20 },
 
-  ambientIntensity: 3,
+  ambientIntensity: 5,
   spotIntensity: 50,
-  pointIntensity: 100,
+  pointIntensity: 400,
 
   shadow: {
     positionY: -3.5,
@@ -56,9 +56,16 @@ const CONFIG = {
   },
 };
 
-function Model({ scrollProgress }: { scrollProgress: any }) {
+// Preload модели сразу
+useGLTF.preload('/lain_li_pc_case.glb');
+
+function Model({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
   const { scene } = useGLTF('/lain_li_pc_case.glb');
-  const modelRef = useRef<THREE.Group>(null);
+
+  // Клонируем сцену чтобы избежать мутации оригинала
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
+
+  const groupRef = useRef<THREE.Group>(null);
 
   const { scroll, offsetX, offsetY, wobble, spring: sp } = CONFIG;
 
@@ -71,23 +78,22 @@ function Model({ scrollProgress }: { scrollProgress: any }) {
   const smoothRotation = useSpring(rotation, sp);
 
   useFrame((state) => {
-    if (modelRef.current) {
-      modelRef.current.position.y =
-        smoothY.get() + offsetY + Math.sin(state.clock.elapsedTime) * wobble;
-      modelRef.current.position.x = smoothX.get() + offsetX;
-      modelRef.current.rotation.y = smoothRotation.get();
-    }
+    if (!groupRef.current) return;
+
+    groupRef.current.position.y =
+      smoothY.get() + offsetY + Math.sin(state.clock.elapsedTime) * wobble;
+    groupRef.current.position.x = smoothX.get() + offsetX;
+    groupRef.current.rotation.y = smoothRotation.get();
   });
 
+  // Убираем Float — он конфликтует с useFrame по position/rotation
+  // Вместо этого оборачиваем в group и двигаем её
   return (
-    <Float
-      speed={CONFIG.floatSpeed}
-      rotationIntensity={CONFIG.floatRotation}
-      floatIntensity={CONFIG.floatIntensity}>
+    <group ref={groupRef}>
       <Center>
-        <primitive ref={modelRef} object={scene} scale={CONFIG.scale} />
+        <primitive object={clonedScene} scale={CONFIG.scale} />
       </Center>
-    </Float>
+    </group>
   );
 }
 
@@ -109,7 +115,8 @@ export default function ScrollScene() {
       <Canvas
         shadows
         camera={{ position: [0, 0, CONFIG.cameraZ], fov: CONFIG.cameraFov }}
-        dpr={[1, 2]}>
+        // Ограничиваем dpr на мобилах
+        dpr={[1, 1.5]}>
         <ambientLight intensity={CONFIG.ambientIntensity} />
         <spotLight
           position={[10, 10, 10]}
