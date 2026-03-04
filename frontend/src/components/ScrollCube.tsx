@@ -1,144 +1,197 @@
 'use client';
 
-import React, { useRef, Suspense, useMemo } from 'react';
+import React, { useRef, Suspense, useMemo, RefObject, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, Environment, ContactShadows, Center, Float } from '@react-three/drei';
+import { useGLTF, Environment, ContactShadows, Center, useProgress } from '@react-three/drei';
 import { useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 import * as THREE from 'three';
 
 const CONFIG = {
-  scale: 0.1,
   offsetX: 1,
   offsetY: -3,
-
   cameraZ: 8,
   cameraFov: 35,
-
-  floatSpeed: 0.5,
-  floatRotation: 0.1,
-  floatIntensity: 0.1,
-
+  wobble: 0,
+  spring: {
+    stiffness: 250,
+    damping: 35,
+    mass: 0.5, // уменьшение массы сделает анимацию еще более "отзывчивой"
+  },
   scroll: {
     yTimes: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0],
-    yKeyframes: [3, 3, 3, 3, 3, 3, 2, 2, 2, 3],
-
+    yKeyframes: [3, 2, 2, 2.5, 5, 5, 2, 3.5, 5, 7],
     xTimes: [0, 0.1, 0.2, 0.3, 0.45, 0.55, 0.6, 0.7, 0.85, 1.0],
-    xKeyframes: [1.5, 1, 0, -1, -1, -1, 0, 1.5, 1.5, 1.5],
-
+    xKeyframes: [1.5, 1, -1, -1, -1, -1.5, -2.5, -2.5, -2.5, -2.5],
     rotTimes: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9, 1.0],
     rotKeyframes: [
       0,
-      Math.PI / 4,
       Math.PI / 2,
-      Math.PI * 1.5,
-      Math.PI * 2,
-      Math.PI * 2,
-      Math.PI * 2,
-      Math.PI * 3,
-      Math.PI * 3.5,
-      Math.PI * 4,
+      Math.PI * 2.1,
+      Math.PI * 2.1,
+      Math.PI * 2.1,
+      Math.PI * 2.1,
+      Math.PI * 4.1,
+      Math.PI * 4.1,
+      Math.PI * 4.1,
+      Math.PI * 4.1,
     ],
+    scaleTimes: [0, 0.2, 0.5, 0.75, 0.8, 1.0],
+    scaleKeyframes: [0.1, 0.1, 0.1, 0.07, 0.07, 0.07],
   },
-
-  wobble: 0,
-  spring: { stiffness: 80, damping: 20 },
-
-  ambientIntensity: 5,
-  spotIntensity: 50,
-  pointIntensity: 400,
-
-  shadow: {
-    positionY: -3.5,
-    opacity: 0.4,
-    scale: 15,
-    blur: 2.5,
-    far: 4,
-  },
+  ambientIntensity: 2.5,
+  spotIntensity: 12,
+  pointIntensity: 60,
+  shadow: { positionY: -3.5, opacity: 0.12, scale: 15, blur: 50, far: 4 },
 };
 
-// Preload модели сразу
-useGLTF.preload('/lain_li_pc_case.glb');
+useGLTF.preload('/lain_li_pc_case-v2.glb');
 
 function Model({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
-  const { scene } = useGLTF('/lain_li_pc_case.glb');
-
-  // Клонируем сцену чтобы избежать мутации оригинала
+  const { scene } = useGLTF('/lain_li_pc_case-v2.glb');
   const clonedScene = useMemo(() => scene.clone(), [scene]);
-
   const groupRef = useRef<THREE.Group>(null);
 
-  const { scroll, offsetX, offsetY, wobble, spring: sp } = CONFIG;
+  const yPos = useTransform(scrollProgress, CONFIG.scroll.yTimes, CONFIG.scroll.yKeyframes);
+  const xPos = useTransform(scrollProgress, CONFIG.scroll.xTimes, CONFIG.scroll.xKeyframes);
+  const rotation = useTransform(scrollProgress, CONFIG.scroll.rotTimes, CONFIG.scroll.rotKeyframes);
+  const scale = useTransform(
+    scrollProgress,
+    CONFIG.scroll.scaleTimes,
+    CONFIG.scroll.scaleKeyframes,
+  );
 
-  const yPos = useTransform(scrollProgress, scroll.yTimes, scroll.yKeyframes);
-  const xPos = useTransform(scrollProgress, scroll.xTimes, scroll.xKeyframes);
-  const rotation = useTransform(scrollProgress, scroll.rotTimes, scroll.rotKeyframes);
-
-  const smoothY = useSpring(yPos, sp);
-  const smoothX = useSpring(xPos, sp);
-  const smoothRotation = useSpring(rotation, sp);
+  const smoothY = useSpring(yPos, CONFIG.spring);
+  const smoothX = useSpring(xPos, CONFIG.spring);
+  const smoothRotation = useSpring(rotation, CONFIG.spring);
+  const smoothScale = useSpring(scale, CONFIG.spring);
 
   useFrame((state) => {
     if (!groupRef.current) return;
-
-    groupRef.current.position.y =
-      smoothY.get() + offsetY + Math.sin(state.clock.elapsedTime) * wobble;
-    groupRef.current.position.x = smoothX.get() + offsetX;
+    groupRef.current.position.y = smoothY.get() + CONFIG.offsetY;
+    groupRef.current.position.x = smoothX.get() + CONFIG.offsetX;
     groupRef.current.rotation.y = smoothRotation.get();
+    const s = smoothScale.get();
+    groupRef.current.scale.set(s, s, s);
   });
 
-  // Убираем Float — он конфликтует с useFrame по position/rotation
-  // Вместо этого оборачиваем в group и двигаем её
   return (
     <group ref={groupRef}>
       <Center>
-        <primitive object={clonedScene} scale={CONFIG.scale} />
+        <primitive object={clonedScene} />
       </Center>
     </group>
   );
 }
 
-export default function ScrollScene() {
-  const { scrollYProgress } = useScroll();
-  const { shadow: s } = CONFIG;
+function Loader() {
+  const { progress } = useProgress();
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (progress === 100) {
+      const timer = setTimeout(() => setIsVisible(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [progress]);
+
+  if (!isVisible) return null;
 
   return (
     <div
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0a0a0a',
+        zIndex: 1000,
+        transition: 'opacity 0.5s ease-out',
+        opacity: progress === 100 ? 0 : 1,
+      }}>
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            border: '3px solid #222',
+            borderTopColor: '#fff',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px',
+          }}
+        />
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+        <p style={{ color: '#666', fontSize: 14, fontFamily: 'system-ui' }}>
+          Загрузка... {Math.round(progress)}%
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface ScrollSceneProps {
+  containerRef: RefObject<HTMLElement | null>;
+}
+
+export default function ScrollScene({ containerRef }: ScrollSceneProps) {
+  // useScroll теперь привязан к контейнеру.
+  // 'start start' — когда верх секции касается верха экрана
+  // 'end end' — когда низ секции касается низа экрана
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  });
+
+  return (
+    <div
+      style={{
+        position: 'absolute', // Чтобы занять всю высоту ScrollSection
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 2,
         pointerEvents: 'none',
       }}>
-      <Canvas
-        shadows
-        camera={{ position: [0, 0, CONFIG.cameraZ], fov: CONFIG.cameraFov }}
-        // Ограничиваем dpr на мобилах
-        dpr={[1, 1.5]}>
-        <ambientLight intensity={CONFIG.ambientIntensity} />
-        <spotLight
-          position={[10, 10, 10]}
-          angle={0.15}
-          penumbra={1}
-          intensity={CONFIG.spotIntensity}
-          castShadow
-        />
-        <pointLight position={[-10, -10, -10]} intensity={CONFIG.pointIntensity} />
+      <div
+        style={{
+          position: 'sticky', // Самое важное: Canvas прилипает к экрану внутри родителя
+          top: 0,
+          width: '100%',
+          height: '100vh',
+          overflow: 'hidden',
+        }}>
+        <Loader />
+        <Canvas
+          shadows
+          gl={{ alpha: true }}
+          camera={{ position: [0, 0, CONFIG.cameraZ], fov: CONFIG.cameraFov }}
+          dpr={[1, 1.5]}
+          style={{ pointerEvents: 'none' }}>
+          <ambientLight intensity={CONFIG.ambientIntensity} />
+          <spotLight position={[5, 10, 8]} intensity={CONFIG.spotIntensity} castShadow />
+          <pointLight position={[-5, 3, 5]} intensity={CONFIG.pointIntensity} />
 
-        <Suspense fallback={null}>
-          <Model scrollProgress={scrollYProgress} />
-          <Environment preset="city" />
-          <ContactShadows
-            position={[0, s.positionY, 0]}
-            opacity={s.opacity}
-            scale={s.scale}
-            blur={s.blur}
-            far={s.far}
-          />
-        </Suspense>
-      </Canvas>
+          <Suspense fallback={null}>
+            <Model scrollProgress={scrollYProgress} />
+            <Environment preset="sunset" />
+            <ContactShadows
+              position={[0, CONFIG.shadow.positionY, 0]}
+              opacity={CONFIG.shadow.opacity}
+              scale={CONFIG.shadow.scale}
+              blur={CONFIG.shadow.blur}
+            />
+          </Suspense>
+        </Canvas>
+      </div>
     </div>
   );
 }

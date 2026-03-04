@@ -1,15 +1,15 @@
 import Header from '@/components/Header/Header';
 import Intro from '@/components/Intro/Intro';
-import ScrollScene from '@/components/ScrollCube';
-import PCBuildSection from '@/components/Slot/Slot';
+import ScrollSection from '@/components/ScrollSection';
 
 export default function Home() {
   return (
     <>
       <Header />
-      <ScrollScene />
+      <ScrollSection />
       <Intro />
-      <PCBuildSection />
+      <Intro />
+      <Intro />
       <Intro />
     </>
   );

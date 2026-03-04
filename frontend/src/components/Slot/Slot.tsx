@@ -7,6 +7,30 @@ const PCBuildSection = () => {
       <div className={s.glowViolet} />
       <div className={s.glowBlue} />
 
+      {/* Кривая линия на фоне */}
+      <svg
+        className={s.curveLine}
+        viewBox="0 0 1200 800"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <path
+          d="M -50 650 C 150 500, 300 100, 600 250 S 950 600, 1250 150"
+          fill="none"
+          stroke="url(#lineGradient)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <defs>
+          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#7B5EA7" stopOpacity="0" />
+            <stop offset="25%" stopColor="#c4c4c4" stopOpacity="0.6" />
+            <stop offset="60%" stopColor="#4F9CF9" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#d7eaff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <div className={`${s.block} ${s.blockTL}`}>
         <h3 className={s.headingViolet}>Идеальный кабель-менеджмент</h3>
         <p className={s.body}>Никаких висящих проводов. Только строгая эстетика.</p>
