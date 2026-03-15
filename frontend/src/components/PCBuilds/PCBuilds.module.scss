@@ -2,35 +2,33 @@
   --c-violet: #8b5cf6;
   --c-blue: #3b82f6;
   --c-green: #10b981;
-  --c-gray: #6b7280;
-  --c-bg: #0a0a0a;
-  --c-card: #0a0a0a;
-  --c-cardHover: #1a1a1a;
-  --c-border: #262626;
+  --c-bg: #060611;
+  --c-card: rgba(12, 12, 30, 0.8);
+  --c-border: rgba(255, 255, 255, 0.06);
   --c-text: #f4f4f5;
-  --c-dim: #a1a1aa;
 }
 
 .section {
-  padding: 100px 0;
+  padding: 120px 0;
   min-height: 100vh;
-  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  position: relative;
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 40px;
 }
 
 .title {
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 52px;
+  font-weight: 800;
   color: var(--c-text);
   text-align: center;
   margin: 0 0 12px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 
-  background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+  background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.6) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -38,9 +36,9 @@
 
 .subtitle {
   font-size: 18px;
-  color: var(--c-dim);
+  color: rgba(255, 255, 255, 0.4);
   text-align: center;
-  margin: 0 0 56px;
+  margin: 0 0 64px;
   font-weight: 400;
 }
 
@@ -49,8 +47,15 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 
-  @media (max-width: 640px) {
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
   }
 }
 
@@ -58,36 +63,68 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
   }
+}
+
+// Glow effect behind popular card
+.cardGlow {
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.2),
+    rgba(124, 58, 237, 0.1),
+    transparent
+  );
+  border-radius: 20px;
+  z-index: -1;
+  filter: blur(20px);
+  opacity: 0.6;
 }
 
 .imageWrapper {
   width: 100%;
-  height: 400px;
+  height: 350px;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.03) 0%, transparent 100%);
 }
 
 .image {
   object-fit: contain;
-  padding: 16px;
-  transition: transform 0.5s ease;
+  padding: 24px;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 
   .card:hover & {
-    transform: scale(1.08);
+    transform: scale(1.06);
   }
 }
 
 .popular {
-  border-color: var(--c-violet);
+  border-color: rgba(139, 92, 246, 0.2);
+
+  &:hover {
+    border-color: rgba(139, 92, 246, 0.35);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(139, 92, 246, 0.08);
+  }
 }
 
 .badge {
@@ -99,24 +136,22 @@
   background: linear-gradient(135deg, var(--c-violet), #7c3aed);
   color: white;
   font-size: 11px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 20px;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 100px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .cardContent {
   padding: 24px 28px 28px;
   display: flex;
   flex-direction: column;
-  background: var(--c-card);
   flex-grow: 1;
   z-index: 10;
-  border-bottom-right-radius: 20px;
-  border-bottom-left-radius: 20px;
-  border: 1px solid var(--c-border);
   position: relative;
+  border-top: 1px solid var(--c-border);
 }
 
 .cardHeader {
@@ -127,16 +162,15 @@
 }
 
 .cardName {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--c-text);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .cardPrice {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--c-text);
+  font-size: 24px;
+  font-weight: 800;
   letter-spacing: -0.02em;
 }
 
@@ -148,42 +182,52 @@
 
   li {
     font-size: 14px;
-    color: var(--c-dim);
+    color: rgba(255, 255, 255, 0.45);
     padding: 10px 0;
-    border-bottom: 1px solid var(--c-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     display: flex;
     align-items: center;
     gap: 10px;
+    transition: color 0.2s ease;
 
     &::before {
-      content: '→';
-      color: var(--c-violet);
-      opacity: 0.6;
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--c-violet);
+      opacity: 0.5;
+      flex-shrink: 0;
     }
 
     &:last-child {
       border-bottom: none;
+    }
+
+    .card:hover & {
+      color: rgba(255, 255, 255, 0.6);
     }
   }
 }
 
 .btn {
   width: 100%;
-  padding: 16px 24px;
-  background: transparent;
-  border: 1px solid var(--c-border);
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  color: var(--c-text);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
   margin-top: auto;
 
   &:hover {
     background: var(--c-text);
     color: var(--c-bg);
     border-color: var(--c-text);
+    transform: translateY(-1px);
   }
 }
 
@@ -191,10 +235,40 @@
   background: linear-gradient(135deg, var(--c-violet), #7c3aed);
   border-color: transparent;
   color: white;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
 
   &:hover {
     background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
     color: white;
+  }
+}
+
+/* Responsive: PCBuilds */
+@media (max-width: 768px) {
+  .section {
+    padding: 80px 0;
+  }
+  .container {
+    padding: 0 20px;
+  }
+  .title {
+    font-size: 36px;
+  }
+  .subtitle {
+    font-size: 15px;
+    margin-bottom: 40px;
+  }
+  .imageWrapper {
+    height: 250px;
+  }
+  .cardContent {
+    padding: 20px;
+  }
+  .cardName {
+    font-size: 18px;
+  }
+  .cardPrice {
+    font-size: 20px;
   }
 }

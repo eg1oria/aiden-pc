@@ -1,0 +1,109 @@
+.section {
+  padding: 120px 0;
+  position: relative;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  position: relative;
+}
+
+.step {
+  position: relative;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.stepNumber {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #8b5cf6;
+  letter-spacing: -0.02em;
+  transition: all 0.3s ease;
+
+  .step:hover & {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.15);
+  }
+}
+
+.stepContent {
+  position: relative;
+  z-index: 1;
+}
+
+.stepTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #f4f4f5;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.stepDesc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+.connector {
+  display: none;
+  position: absolute;
+  top: 28px;
+  right: -12px;
+  width: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.1));
+
+  @media (min-width: 769px) {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 80px 0;
+  }
+  .container {
+    padding: 0 20px;
+  }
+  .timeline {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .step {
+    display: flex;
+    text-align: left;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 0;
+  }
+  .stepNumber {
+    margin: 0;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+}

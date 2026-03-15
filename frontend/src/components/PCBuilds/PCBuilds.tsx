@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import s from './PCBuilds.module.scss';
 
 const BUILDS = [
@@ -39,27 +40,54 @@ const BUILDS = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.12,
+      duration: 0.6,
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+    },
+  }),
+};
+
 export default function PCBuilds() {
   return (
-    <section className={s.section}>
+    <section className={s.section} id="builds">
       <div className={s.container}>
-        <h2 className={s.title}>Готовые сборки</h2>
-        <p className={s.subtitle}>Проверенные конфигурации под любые задачи</p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}>
+          <h2 className={s.title}>Готовые сборки</h2>
+          <p className={s.subtitle}>Проверенные конфигурации под любые задачи</p>
+        </motion.div>
 
         <div className={s.grid}>
-          {BUILDS.map((build) => (
-            <div key={build.id} className={`${s.card} ${build.popular ? s.popular : ''}`}>
+          {BUILDS.map((build, i) => (
+            <motion.div
+              key={build.id}
+              className={`${s.card} ${build.popular ? s.popular : ''}`}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}>
+              {/* Gradient border glow for popular */}
+              {build.popular && <div className={s.cardGlow} />}
+
               <div className={s.imageWrapper}>
                 {build.image && (
-                  <div className={s.imageWrapper}>
-                    <Image
-                      src={build.image}
-                      alt={build.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 50vw"
-                      className={s.image}
-                    />
-                  </div>
+                  <Image
+                    src={build.image}
+                    alt={build.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    className={s.image}
+                  />
                 )}
               </div>
 
@@ -67,7 +95,9 @@ export default function PCBuilds() {
                 {build.popular && <span className={s.badge}>Хит</span>}
                 <div className={s.cardHeader}>
                   <span className={s.cardName}>{build.name}</span>
-                  <span className={s.cardPrice}>{build.price}</span>
+                  <span className={s.cardPrice} style={{ color: build.color }}>
+                    {build.price}
+                  </span>
                 </div>
 
                 <ul className={s.specs}>
@@ -76,9 +106,15 @@ export default function PCBuilds() {
                   ))}
                 </ul>
 
-                <button className={s.btn}>Выбрать</button>
+                <button
+                  className={s.btn}
+                  onClick={() =>
+                    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+                  }>
+                  Выбрать
+                </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -1,5 +1,19 @@
+'use client';
+
 import React from 'react';
+import { motion } from 'framer-motion';
 import s from './Slot.module.scss';
+
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  transition: {
+    duration: 0.7,
+    delay,
+    ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+  },
+  viewport: { once: true, margin: '-50px' as const },
+});
 
 const PCBuildSection = () => {
   return (
@@ -7,7 +21,6 @@ const PCBuildSection = () => {
       <div className={s.glowViolet} />
       <div className={s.glowBlue} />
 
-      {/* Кривая линия на фоне */}
       <svg
         className={s.curveLine}
         viewBox="0 0 1200 800"
@@ -31,41 +44,41 @@ const PCBuildSection = () => {
         </defs>
       </svg>
 
-      <div className={`${s.block} ${s.blockTL}`}>
+      <motion.div className={`${s.block} ${s.blockTL}`} {...fadeUp(0)}>
         <h3 className={s.headingViolet}>Идеальный кабель-менеджмент</h3>
         <p className={s.body}>Никаких висящих проводов. Только строгая эстетика.</p>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockTR}`}>
+      <motion.div className={`${s.block} ${s.blockTR}`} {...fadeUp(0.1)}>
         <h3 className={s.headingBlue}>Кастомная «водянка»</h3>
         <p className={s.body}>Охладим даже самый горячий пыл вашего процессора.</p>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockML}`}>
+      <motion.div className={`${s.block} ${s.blockML}`} {...fadeUp(0.2)}>
         <span className={`${s.label} ${s.labelViolet}`}>Premium детали</span>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockML2}`}>
+      <motion.div className={`${s.block} ${s.blockML2}`} {...fadeUp(0.25)}>
         <p className={s.body}>Акустические панели и беззвучные вентиляторы.</p>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockMR}`}>
+      <motion.div className={`${s.block} ${s.blockMR}`} {...fadeUp(0.2)}>
         <span className={`${s.label} ${s.labelBlue}`}>Стресс-тесты 24 часа</span>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockMR2}`}>
+      <motion.div className={`${s.block} ${s.blockMR2}`} {...fadeUp(0.25)}>
         <p className={s.body}>Оптимальный баланс цены и производительности.</p>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockBL}`}>
+      <motion.div className={`${s.block} ${s.blockBL}`} {...fadeUp(0.3)}>
         <h3 className={s.headingGradient}>FPS до небес</h3>
         <p className={s.body}>Сборки на базе новейших RTX видеокарт.</p>
-      </div>
+      </motion.div>
 
-      <div className={`${s.block} ${s.blockBR}`}>
+      <motion.div className={`${s.block} ${s.blockBR}`} {...fadeUp(0.35)}>
         <h3 className={s.headingBlue}>Гарантия 3 года</h3>
         <p className={s.body}>Полная поддержка и бесплатное ТО.</p>
-      </div>
+      </motion.div>
     </section>
   );
 };

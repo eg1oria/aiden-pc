@@ -65,7 +65,7 @@ function Model({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
   const smoothRotation = useSpring(rotation, CONFIG.spring);
   const smoothScale = useSpring(scale, CONFIG.spring);
 
-  useFrame((state) => {
+  useFrame(() => {
     if (!groupRef.current) return;
     groupRef.current.position.y = smoothY.get() + CONFIG.offsetY;
     groupRef.current.position.x = smoothX.get() + CONFIG.offsetX;
@@ -89,7 +89,7 @@ function Loader() {
 
   useEffect(() => {
     if (progress === 100) {
-      const timer = setTimeout(() => setIsVisible(false), 500);
+      const timer = setTimeout(() => setIsVisible(false), 600);
       return () => clearTimeout(timer);
     }
   }, [progress]);
@@ -107,21 +107,23 @@ function Loader() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#0a0a0a',
+        background: '#060611',
         zIndex: 1000,
-        transition: 'opacity 0.5s ease-out',
+        transition: 'opacity 0.6s ease-out',
         opacity: progress === 100 ? 0 : 1,
       }}>
       <div style={{ textAlign: 'center' }}>
+        {/* Gradient spinner */}
         <div
           style={{
             width: 48,
             height: 48,
-            border: '3px solid #222',
-            borderTopColor: '#fff',
             borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 16px',
+            border: '2px solid rgba(139, 92, 246, 0.1)',
+            borderTopColor: '#8b5cf6',
+            animation: 'spin 0.8s linear infinite',
+            margin: '0 auto 20px',
+            boxShadow: '0 0 20px rgba(139, 92, 246, 0.15)',
           }}
         />
         <style>{`
@@ -129,8 +131,35 @@ function Loader() {
             to { transform: rotate(360deg); }
           }
         `}</style>
-        <p style={{ color: '#666', fontSize: 14, fontFamily: 'system-ui' }}>
-          Загрузка... {Math.round(progress)}%
+        {/* Progress bar */}
+        <div
+          style={{
+            width: 120,
+            height: 2,
+            background: 'rgba(255, 255, 255, 0.06)',
+            borderRadius: 1,
+            overflow: 'hidden',
+            margin: '0 auto 12px',
+          }}>
+          <div
+            style={{
+              width: `${progress}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #8b5cf6, #d946ef)',
+              borderRadius: 1,
+              transition: 'width 0.3s ease',
+            }}
+          />
+        </div>
+        <p
+          style={{
+            color: 'rgba(255, 255, 255, 0.3)',
+            fontSize: 12,
+            fontFamily: 'system-ui',
+            letterSpacing: '0.05em',
+            margin: 0,
+          }}>
+          {Math.round(progress)}%
         </p>
       </div>
     </div>
