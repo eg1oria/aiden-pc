@@ -9,12 +9,20 @@ import FAQ from '@/components/FAQ/FAQ';
 import AvitoForm from '@/components/AvitoForm/AvitoForm';
 import Contact from '@/components/Contact/Contact';
 import Footer from '@/components/Footer/Footer';
-
+import Hello from '@/components/Alice';
+import List from '@/components/List';
+import UseState from '@/components/UseState';
+import Split from '@/components/Split';
 export default function Home() {
+  const list = ['Apple', 'PineApple', 'Груша'];
   return (
     <>
       <Header />
       <main>
+        <List items={list} />
+        <Hello name="" />
+        <UseState />
+        <Split />
         <ScrollSection />
         <WhyUs />
         <ForWhom />

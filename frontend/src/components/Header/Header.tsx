@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import s from './Header.module.scss';
+import Link from 'next/link';
 
 const NAV_ITEMS = [
   { label: 'Готовые сборки', href: '#builds' },
@@ -43,12 +44,12 @@ export default function Header() {
     <header className={`${s.header} ${scrolled ? s.scrolled : ''}`}>
       <div className="container">
         <div className={s.header_content}>
-          <a href="#" className={s.header_content_logo}>
+          <Link href="/todo" className={s.header_content_logo}>
             <span className={s.header_content_logo_text}>АЙДЕН</span>
             <span className={`${s.header_content_logo_text} ${s.header_content_logo_color}`}>
               ПК
             </span>
-          </a>
+          </Link>
           <nav className={`${s.header_content_nav} ${menuOpen ? s.navOpen : ''}`}>
             <ul className={s.header_content_nav_list}>
               {NAV_ITEMS.map((item) => (
